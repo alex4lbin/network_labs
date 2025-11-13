@@ -1,0 +1,6 @@
+ip multicast-routing
+!
+{% for iface in interfaces %}
+interface {{ iface.ifname }}
+  ip pim sparse-mode
+{% endfor %}

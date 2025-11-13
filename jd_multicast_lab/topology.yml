@@ -1,0 +1,95 @@
+---
+defaults:
+  device: iosv
+  providers.libvirt.batch_size: 6
+
+plugin: [bgp.policy]
+
+nodes:
+  Silicon:
+  Aluminium:
+  Tin:
+  Lead:
+  Iridium:
+  Gold:
+  Silver:
+  Copper:
+  Mercury:
+  Carbon:
+  Zinc:
+  Oxygen:
+  Neon:
+  Argon:
+  SW1:
+  SW2:
+  Source:
+  Receiver1:
+  Receiver2:
+
+groups:
+  domain1:
+    members: [Silicon, Aluminium, Tin, Lead, Iridium, Gold, Silver]
+    module: [bgp, ospf, routing]
+    bgp.as: 65100
+    config: [pim-sm]
+  domain2:
+    members: [Copper, Mercury, Carbon, Zinc, Oxygen, Neon, Argon]
+    module: [bgp, isis, routing]
+    bgp.as: 65200
+    config: [pim-sm]
+  vrrp:
+    members: [Silicon, Aluminium, Neon, Argon]
+    module: [gateway]
+  switches:
+    members: [SW1, SW2]
+    role: bridge
+    device: iosvl2
+  mcast-receivers:
+    members: [Receiver1, Receiver2]
+    role: host
+    config: [igmp]
+  mcast-sources:
+    members: [Source]
+    role: host
+
+routing.policy:
+  set_locpref:
+    set.locpref: 200
+
+gateway.protocol: vrrp
+
+links:
+  domain1:
+    - Lead-Silicon
+    - Lead-Aluminium
+    - Lead-Tin
+    - Lead-Iridium
+    - Lead-Gold
+    - Lead-Silver
+    - Tin-Silicon
+    - Tin-Gold
+    - Iridium-Aluminium
+    - Iridium-Silver
+    - group: lan_seg
+      members: [SW1-Silicon, SW1-Aluminium, SW1-Source]
+      gateway:
+  domain2:
+    - Zinc-Copper
+    - Zinc-Mercury
+    - Zinc-Carbon
+    - Zinc-Oxygen
+    - Zinc-Neon
+    - Zinc-Argon
+    - Carbon-Copper
+    - Carbon-Neon
+    - Oxygen-Mercury
+    - Oxygen-Argon
+    - group: lan_seg
+      members: [SW2-Argon, SW2-Neon, SW2-Receiver1, SW2-Receiver2]
+      gateway:
+  inter-domain:
+    - Gold:
+        bgp.policy.in: set_locpref
+      Copper:
+        bgp.policy.in: set_locpref
+    - Silver-Mercury
