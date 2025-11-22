@@ -1,6 +1,3 @@
-#!/bin/bash
-
-#############################################
 #
 # Call this script as
 # ./pcap.sh <node> [<filters>]
@@ -36,14 +33,16 @@ fi
 
 declare -A interfaces_dict
 
-echo "$report" | awk 'NR==4'
+report=$(echo "$report" | awk "/^$node +\(.*\)/ { found=1 } NF && found { \$1=\$1; print }")
+echo "$report" | head -n 1
+
 index=1
 while IFS= read -r line; do
   [[ -z "$line" ]] && continue
   echo "$line"
   interfaces_dict[$index]=$(echo "$line" | awk '{ print $2 }')
   ((index++))
-done < <(echo "$report" | tail -n +5 | awk 'NF { $1=$1; print }' | nl -w1 -s ') ')
+done < <(echo "$report" | tail -n +2 | nl -w1 -s ') ')
 
 read -p "Enter interface number: " iface_key
 if [[ -z "${interfaces_dict[$iface_key]}" ]]; then
