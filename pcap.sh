@@ -1,3 +1,6 @@
+#!/bin/bash
+
+#############################################
 #
 # Call this script as
 # ./pcap.sh <node> [<filters>]
@@ -33,7 +36,7 @@ fi
 
 declare -A interfaces_dict
 
-report=$(echo "$report" | awk "/^$node +\(.*\)/ { found=1 } NF && found { \$1=\$1; print }")
+report=$(echo "$report" | awk "/^$node( +\(.*\))?/ { found=1 } NF && found { \$1=\$1; print }")
 echo "$report" | head -n 1
 
 index=1
